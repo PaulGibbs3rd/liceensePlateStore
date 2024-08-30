@@ -26,7 +26,7 @@ export function App() {
 
     useEffect(() => {
         setLoading(true);
-        fetch('api/plates')
+        fetch('/plates.json') // Fetching from the static file
             .then(response => response.json())
             .then((data: LicensePlateData[]) => {
                 setPlates(data);
@@ -34,6 +34,7 @@ export function App() {
             })
             .catch(() => setLoading(false));
     }, []);
+
 
     return (
         <div className="App">

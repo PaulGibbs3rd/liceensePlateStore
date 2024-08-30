@@ -3,10 +3,10 @@ import './LicensePlate.css';
 import { Currency, LicensePlateData } from '../license-plate-data.type';
 
 interface LicensePlateProps {
-  plate: LicensePlateData; // Match the type here with LicensePlateData
+  plate: LicensePlateData;
   currency: Currency;
   buttonText: string;
-  onButtonClicked: (plate: LicensePlateData) => void;  // Correct prop type
+  onButtonClicked?: (plate: LicensePlateData) => void;  // Optional since it’s not always needed
 }
 
 const CURRENCIES = { EUR: "€", USD: "$", GBP: "£" };
@@ -21,18 +21,20 @@ export function LicensePlate(props: LicensePlateProps): JSX.Element {
   const [convertedPrice, setConvertedPrice] = useState<number>(plate.price);
 
   useEffect(() => {
-    fetch('http://localhost:8000/rates')
-      .then(response => response.json())
-      .then(data => setExchangeRates(data))
-      .catch(error => console.error("Error fetching exchange rates:", error));
-  }, []);
+    fetch('/rates.json') // Fetching from the static file
+        .then(response => response.json())
+        .then(data => setExchangeRates(data))
+        .catch(error => console.error("Error fetching exchange rates:", error));
+}, []);
 
   useEffect(() => {
     setConvertedPrice(plate.price * exchangeRates[currency]);
   }, [currency, exchangeRates, plate.price]);
 
   const buttonClicked = () => {
-    onButtonClicked(plate);  // Call the handler with the plate data
+    if (onButtonClicked) {
+      onButtonClicked(plate);
+    }
   };
 
   return (
@@ -45,12 +47,12 @@ export function LicensePlate(props: LicensePlateProps): JSX.Element {
       <p>{plate.description}</p>
       <div>
         <h2 className="float-left">
-          {CURRENCIES[currency]} {convertedPrice.toFixed(2)}
+          {CURRENCIES[currency]} {isNaN(convertedPrice) ? 'N/A' : convertedPrice.toFixed(2)}
         </h2>
         <button
           className="btn btn-primary float-right"
           role="button"
-          onClick={buttonClicked}  // Use the buttonClicked handler here
+          onClick={buttonClicked}
         >
           {buttonText}
         </button>
