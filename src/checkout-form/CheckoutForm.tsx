@@ -37,11 +37,11 @@ export function CheckoutForm() {
 
   // Fetch the list of states
   useEffect(() => {
-    fetch('api/states')
-      .then((response) => response.json())
-      .then((data) => setStates(data))
-      .catch((error) => console.error('Error fetching states:', error));
-  }, []);
+    fetch('/US_statesData.json') // Fetching from the static file
+        .then((response) => response.json())
+        .then((data) => setStates(data))
+        .catch((error) => console.error('Error fetching states:', error));
+}, []);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
