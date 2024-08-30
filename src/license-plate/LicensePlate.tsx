@@ -5,6 +5,7 @@ import { Currency, LicensePlateData } from '../license-plate-data.type';
 interface LicensePlateProps {
   plate: LicensePlateData;
   currency: Currency;
+  exchangeRates: { [key in Currency]: number };
   buttonText: string;
   onButtonClicked?: (plate: LicensePlateData) => void;  // Optional since it’s not always needed
 }
@@ -12,24 +13,18 @@ interface LicensePlateProps {
 const CURRENCIES = { EUR: "€", USD: "$", GBP: "£" };
 
 export function LicensePlate(props: LicensePlateProps): JSX.Element {
-  const { plate, buttonText, currency, onButtonClicked } = props;
-  const [exchangeRates, setExchangeRates] = useState<{ [key in Currency]: number }>({
-    EUR: 1,
-    GBP: 1,
-    USD: 1,
-  });
+  const { plate, buttonText, currency, exchangeRates, onButtonClicked } = props;
   const [convertedPrice, setConvertedPrice] = useState<number>(plate.price);
 
   useEffect(() => {
-    fetch('/rates.json') // Fetching from the static file
-        .then(response => response.json())
-        .then(data => setExchangeRates(data))
-        .catch(error => console.error("Error fetching exchange rates:", error));
-}, []);
+    if (exchangeRates && exchangeRates[currency]) {
+        setConvertedPrice(plate.price * exchangeRates[currency]);
+    } else {
+        console.error("Invalid currency or exchangeRates", exchangeRates, currency);
+        setConvertedPrice(plate.price); // Fallback to original price
+    }
+}, [currency, exchangeRates, plate.price]);
 
-  useEffect(() => {
-    setConvertedPrice(plate.price * exchangeRates[currency]);
-  }, [currency, exchangeRates, plate.price]);
 
   const buttonClicked = () => {
     if (onButtonClicked) {
@@ -47,7 +42,7 @@ export function LicensePlate(props: LicensePlateProps): JSX.Element {
       <p>{plate.description}</p>
       <div>
         <h2 className="float-left">
-          {CURRENCIES[currency]} {isNaN(convertedPrice) ? 'N/A' : convertedPrice.toFixed(2)}
+          {CURRENCIES[currency]} {!isNaN(convertedPrice) ? convertedPrice.toFixed(2) : 'N/A'}
         </h2>
         <button
           className="btn btn-primary float-right"

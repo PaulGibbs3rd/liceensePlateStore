@@ -8,33 +8,38 @@ import { CheckoutView } from "./checkout-view/CheckoutView";
 import { Currency, LicensePlateData } from './license-plate-data.type';
 import { MapView } from './mapview/MapView';
 
-type LicensePlateType = {
-    id: string;
-    number: string;
-    state: string;
-    title: string;
-    picture: string;
-    description: string;
-    price: number;
-    onSale: boolean;
-};
-
 export function App() {
     const [currency, setCurrency] = useState<Currency>('USD');
     const [licensePlates, setPlates] = useState<LicensePlateData[]>([]);
+    const [exchangeRates, setExchangeRates] = useState<{ [key in Currency]: number }>({ USD: 1, EUR: 1, GBP: 1 });
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         setLoading(true);
-        fetch('/plates.json') // Fetching from the static file
+    
+        // Fetch the license plates data
+        fetch('/platesData.json')
             .then(response => response.json())
             .then((data: LicensePlateData[]) => {
                 setPlates(data);
                 setLoading(false);
             })
             .catch(() => setLoading(false));
+        
+        // Fetch the exchange rates
+        fetch('/rates.json')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Exchange rates fetched:", data); // Debugging line
+                setExchangeRates(data);
+            })
+            .catch(error => {
+                console.error("Error fetching exchange rates:", error);
+                setExchangeRates({ USD: 1, EUR: 1, GBP: 1 }); // Fallback to default
+            });
+    
     }, []);
-
+    
 
     return (
         <div className="App">
@@ -49,8 +54,10 @@ export function App() {
                             element={<StoreView 
                                 currency={currency} 
                                 licensePlates={licensePlates} 
+                                exchangeRates={exchangeRates} 
                                 loading={loading} 
-                            />} 
+                            />
+                            } 
                         />
                         <Route path="/cart" element={<CartView currency={currency} />} />
                         <Route path="/checkout" element={<CheckoutView />} />

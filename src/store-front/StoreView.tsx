@@ -10,12 +10,13 @@ import { useCart } from '../cart-service/cart-hook';
 
 export interface StoreViewProps {
   currency: Currency;
-  licensePlates: LicensePlateData[];  // Use LicensePlateData directly
+  licensePlates: LicensePlateData[];
+  exchangeRates: { [key in Currency]: number };
   loading: boolean;
 }
 
 export function StoreView(props: StoreViewProps) {
-  const { licensePlates, loading, currency } = props;
+  const { licensePlates, loading, currency, exchangeRates } = props;
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [cart, addToCart] = useCart();
 
@@ -45,6 +46,7 @@ export function StoreView(props: StoreViewProps) {
                     <LicensePlate
                       plate={licensePlate}
                       currency={currency}
+                      exchangeRates={exchangeRates}
                       buttonText="Add to cart"
                       onButtonClicked={() => addPlateToCart(licensePlate)}  // Ensure the prop is passed correctly
                     />
@@ -56,7 +58,7 @@ export function StoreView(props: StoreViewProps) {
           <div className="col-md-4">
             <h4>Map View</h4>
             <div style={{ height: '500px', width: '100%', border: '1px solid #ccc' }}>
-              <MapView licensePlates={licensePlates} />
+              <MapView licensePlates={licensePlates} /> 
             </div>
           </div>
         </div>

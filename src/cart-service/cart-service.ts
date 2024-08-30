@@ -1,6 +1,7 @@
 import {LicensePlateData} from '../license-plate-data.type';
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000';
+
 
 export function addToCart(plate: LicensePlateData) {
 	return fetch(BASE_URL + '/cart/' + plate._id, {method: 'PUT'})
