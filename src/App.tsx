@@ -26,7 +26,7 @@ export function App() {
 
     useEffect(() => {
         setLoading(true);
-        fetch('http://localhost:8000/data')
+        fetch('api/plates')
             .then(response => response.json())
             .then((data: LicensePlateData[]) => {
                 setPlates(data);

@@ -37,7 +37,7 @@ export function CheckoutForm() {
 
   // Fetch the list of states
   useEffect(() => {
-    fetch('http://localhost:8000/states')
+    fetch('api/states')
       .then((response) => response.json())
       .then((data) => setStates(data))
       .catch((error) => console.error('Error fetching states:', error));
